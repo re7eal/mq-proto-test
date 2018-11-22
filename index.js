@@ -73,5 +73,7 @@ const buffer2 = EncryptedMqMessage.encode(message2).finish();
 
 ///////////////////
 
-sendingSocket.send(buffer2);
-console.log('sent:', buffer2);
+setInterval(() => {
+  sendingSocket.send(buffer2);
+  console.log('sent:', buffer2);
+}, 2000);
