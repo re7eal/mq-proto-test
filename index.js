@@ -71,9 +71,32 @@ const message2 = EncryptedMqMessage.create(payload2);
 
 const buffer2 = EncryptedMqMessage.encode(message2).finish();
 
+console.log('encrypted:', buffer);
+
+const MqProtocolMessage = root.lookup('MqProtocolMessage');
+
+let id = Date.now();
+let seq = 1;
+
+const payload3 = {
+  msg_id: id++,
+  seq_id: seq++,
+  message: buffer2,
+  sender_id: 'test-mq',
+};
+
+const errMsg3 = MqProtocolMessage.verify(payload3);
+if (errMsg3) {
+  throw new Error(errMsg);
+}
+
+const message3 = MqProtocolMessage.create(payload3);
+
+const buffer3 = MqProtocolMessage.encode(message3).finish();
+
 ///////////////////
 
 setInterval(() => {
-  sendingSocket.send(buffer2);
-  console.log('sent:', buffer2);
+  sendingSocket.send(buffer3);
+  console.log('sent:', buffer3);
 }, 2000);
