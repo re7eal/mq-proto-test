@@ -74,7 +74,7 @@ let seq = 1;
 setInterval(() => {
   const payload3 = {
     msg_id: id++,
-    seq_id: seq++,
+    seq_id: seq,
     message: buffer2,
     sender_id: 'test-mq',
   };
