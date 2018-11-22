@@ -7,6 +7,22 @@ const root = mqMessageProtobufRootInstance.loadSync('./message.proto', {
   keepCase: true,
 });
 
+const MqMessage = root.lookup('MqMessage');
+const EncryptedMqMessage = root.lookup('EncryptedMqMessage');
+const MqProtocolMessage = root.lookup('MqProtocolMessage');
+
+function extractRetrySpec(message) {
+  const decodedMessage = MqProtocolMessage.decode(message);
+  return {
+    retryspec: {
+      msgId: decodedMessage.msg_id.toNumber(),
+      seqId: decodedMessage.seq_id,
+    },
+    message: decodedMessage.message,
+    senderId: decodedMessage.sender_id,
+  };
+}
+
 const dest = {
   ip: process.env.DEST_IP,
   port: process.env.DEST_PORT,
@@ -31,14 +47,13 @@ sendingSocket.on('error', (err) => {
 
 sendingSocket.on('message', (messageBuffer) => {
   console.log('incoming message:', messageBuffer);
+  console.log('parsed incoming message:', extractRetrySpec(messageBuffer));
 });
 
 const destUri = `tcp://${dest.ip}:${dest.port}`;
 sendingSocket.connect(destUri);
 
 ///////////////////
-
-const MqMessage = root.lookup('MqMessage');
 
 const payload = {
   message: Buffer.from('some message'),
@@ -58,7 +73,6 @@ const buffer = MqMessage.encode(message).finish();
 
 console.log('to encrypt:', buffer);
 
-const EncryptedMqMessage = root.lookup('EncryptedMqMessage');
 const payload2 = {
   encrypted_symmetric_key: Buffer.from('asdgfdgsdgsd'),
   encrypted_mq_message: buffer,
@@ -72,8 +86,6 @@ const message2 = EncryptedMqMessage.create(payload2);
 const buffer2 = EncryptedMqMessage.encode(message2).finish();
 
 console.log('encrypted:', buffer);
-
-const MqProtocolMessage = root.lookup('MqProtocolMessage');
 
 let id = Date.now();
 let seq = 1;
