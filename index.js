@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const zmq = require('zeromq');
 
 const protobuf = require('protobufjs');
@@ -28,10 +29,15 @@ const dest = {
   port: process.env.DEST_PORT,
 };
 
+const messageInPayloadSize = process.env.MSG_SIZE
+  ? parseInt(process.env.MSG_SIZE)
+  : 1024;
+
 ///////////////////
 
 const payload = {
-  message: Buffer.from('some message'),
+  // message: Buffer.from('some message'),
+  message: crypto.randomBytes(messageInPayloadSize),
   signature: Buffer.from('signature'),
   receiver_node_id: 'none',
   sender_node_id: 'test-mq',
