@@ -25,6 +25,10 @@ sendingSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 0);
 //no block // wait forever until close
 sendingSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 0);
 
+sendingSocket.on('error', (err) => {
+  console.error('error:', err);
+});
+
 sendingSocket.on('message', (messageBuffer) => {
   console.log('incoming message:', messageBuffer);
 });
