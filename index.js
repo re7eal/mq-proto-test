@@ -28,31 +28,6 @@ const dest = {
   port: process.env.DEST_PORT,
 };
 
-const sendingSocket = zmq.socket('req');
-// socket option
-// small lingering time ( 50ms ) after socket close. we want to control send by business logic
-sendingSocket.setsockopt(zmq.ZMQ_LINGER, 0);
-//not setting means unlimited number of queueing message
-//sendingSocket.setsockopt(zmq.ZMQ_HWM, 0);
-//ALL in MEMORY --
-//sendingSocket.setsockopt(zmq.ZMQ_SWAP, 0);
-//no block // wait forever until close
-sendingSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 0);
-//no block // wait forever until close
-sendingSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 0);
-
-sendingSocket.on('error', (err) => {
-  console.error('error:', err);
-});
-
-sendingSocket.on('message', (messageBuffer) => {
-  console.log('incoming message:', messageBuffer);
-  console.log('parsed incoming message:', extractRetrySpec(messageBuffer));
-});
-
-const destUri = `tcp://${dest.ip}:${dest.port}`;
-sendingSocket.connect(destUri);
-
 ///////////////////
 
 const payload = {
@@ -110,6 +85,31 @@ setInterval(() => {
   const buffer3 = MqProtocolMessage.encode(message3).finish();
 
   ///////////////////
+
+  const sendingSocket = zmq.socket('req');
+  // socket option
+  // small lingering time ( 50ms ) after socket close. we want to control send by business logic
+  sendingSocket.setsockopt(zmq.ZMQ_LINGER, 0);
+  //not setting means unlimited number of queueing message
+  //sendingSocket.setsockopt(zmq.ZMQ_HWM, 0);
+  //ALL in MEMORY --
+  //sendingSocket.setsockopt(zmq.ZMQ_SWAP, 0);
+  //no block // wait forever until close
+  sendingSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 0);
+  //no block // wait forever until close
+  sendingSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 0);
+
+  sendingSocket.on('error', (err) => {
+    console.error('error:', err);
+  });
+
+  sendingSocket.on('message', (messageBuffer) => {
+    console.log('incoming message:', messageBuffer);
+    console.log('parsed incoming message:', extractRetrySpec(messageBuffer));
+  });
+
+  const destUri = `tcp://${dest.ip}:${dest.port}`;
+  sendingSocket.connect(destUri);
 
   sendingSocket.send(buffer3);
   console.log('sent:', buffer3);
