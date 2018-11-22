@@ -3,10 +3,9 @@ const zmq = require('zeromq');
 const protobuf = require('protobufjs');
 
 const mqMessageProtobufRootInstance = new protobuf.Root();
-const root = mqMessageProtobufRootInstance.loadSync(
-  './message.proto',
-  { keepCase: true }
-);
+const root = mqMessageProtobufRootInstance.loadSync('./message.proto', {
+  keepCase: true,
+});
 
 const dest = {
   ip: process.env.DEST_IP,
@@ -25,6 +24,10 @@ sendingSocket.setsockopt(zmq.ZMQ_LINGER, 0);
 sendingSocket.setsockopt(zmq.ZMQ_RCVTIMEO, 0);
 //no block // wait forever until close
 sendingSocket.setsockopt(zmq.ZMQ_SNDTIMEO, 0);
+
+sendingSocket.on('message', (messageBuffer) => {
+  console.log('incoming message:', messageBuffer);
+});
 
 const destUri = `tcp://${dest.ip}:${dest.port}`;
 sendingSocket.connect(destUri);
