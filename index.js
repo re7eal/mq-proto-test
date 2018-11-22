@@ -78,25 +78,27 @@ const MqProtocolMessage = root.lookup('MqProtocolMessage');
 let id = Date.now();
 let seq = 1;
 
-const payload3 = {
-  msg_id: id++,
-  seq_id: seq++,
-  message: buffer2,
-  sender_id: 'test-mq',
-};
-
-const errMsg3 = MqProtocolMessage.verify(payload3);
-if (errMsg3) {
-  throw new Error(errMsg);
-}
-
-const message3 = MqProtocolMessage.create(payload3);
-
-const buffer3 = MqProtocolMessage.encode(message3).finish();
-
-///////////////////
-
 setInterval(() => {
+  const payload3 = {
+    msg_id: id++,
+    seq_id: seq++,
+    message: buffer2,
+    sender_id: 'test-mq',
+  };
+
+  console.log('sending payload:', payload3);
+
+  const errMsg3 = MqProtocolMessage.verify(payload3);
+  if (errMsg3) {
+    throw new Error(errMsg);
+  }
+
+  const message3 = MqProtocolMessage.create(payload3);
+
+  const buffer3 = MqProtocolMessage.encode(message3).finish();
+
+  ///////////////////
+
   sendingSocket.send(buffer3);
   console.log('sent:', buffer3);
 }, 2000);
