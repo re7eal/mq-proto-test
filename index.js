@@ -118,5 +118,14 @@ setInterval(() => {
   sendingSocket.connect(destUri);
 
   sendingSocket.send(buffer3);
+  console.log(
+    'sent size:',
+    buffer3.length,
+    'B',
+    buffer3.length / 1024,
+    'KB',
+    buffer3.length / (1024 * 1024),
+    'MB'
+  );
   console.log('sent:', buffer3);
 }, 2000);
