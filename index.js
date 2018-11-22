@@ -38,10 +38,30 @@ sendingSocket.connect(destUri);
 
 ///////////////////
 
+const MqMessage = root.lookup('MqMessage');
+
+const payload = {
+  message: Buffer.from('some message'),
+  signature: Buffer.from('signature'),
+  receiver_node_id: 'none',
+  sender_node_id: 'test-mq',
+};
+
+const errMsg = MqMessage.verify(payload);
+if (errMsg) {
+  throw new Error(errMsg);
+}
+
+const message = MqMessage.create(payload);
+
+const buffer = MqMessage.encode(message).finish();
+
+console.log('to encrypt:', buffer);
+
 const EncryptedMqMessage = root.lookup('EncryptedMqMessage');
 const payload2 = {
   encrypted_symmetric_key: Buffer.from('asdgfdgsdgsd'),
-  encrypted_mq_message: Buffer.from('1242asfasfasfasfwqrqwr'),
+  encrypted_mq_message: buffer,
 };
 const errMsg2 = EncryptedMqMessage.verify(payload2);
 if (errMsg2) {
@@ -54,3 +74,4 @@ const buffer2 = EncryptedMqMessage.encode(message2).finish();
 ///////////////////
 
 sendingSocket.send(buffer2);
+console.log('sent:', buffer2);
